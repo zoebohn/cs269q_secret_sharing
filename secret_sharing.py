@@ -10,6 +10,14 @@ def Bob(qubits):
 def Charlie(qubits):
     pass
 
+# from docs.rigetti.com
+def ghz_state(qubits):
+    program = Program()
+    program += H(qubits[0])
+    for q1, q2 in zip(qubits, qubits[1:]):
+        program += CNOT(q1, q2)
+    return program
+
 def initial_setup():
     pass
 
