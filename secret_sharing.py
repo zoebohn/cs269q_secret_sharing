@@ -75,7 +75,7 @@ for trial in range(NUM_TRIALS):
                 continue
             # run program, now that we know results will be interesting
             qvm = QVMConnection()
-            program = program.measure_all()
+            program = program.measure_all() # TODO - this is just measuring them all, not according to a particular direction
             results = qvm.run(program)[0]
             alice_measure_result = results[0]
             bob_measure_result = results[1]
