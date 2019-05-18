@@ -1,6 +1,7 @@
 from pyquil import Program
 from pyquil.gates import CNOT, CZ, H, X, Z
 import random
+from pyquil.api import QVMConnection
 
 def choose_random_direction():
     x_or_y = random.getrandbits(1)
@@ -11,21 +12,18 @@ def choose_random_direction():
 
 def alice(qubit, message, program):
     alice_measure_dir = choose_random_direction()
-    alice_measure_result = None
-
-    return alice_measure_dir, alice_measure_result
+    # TODO
+    return alice_measure_dir
 
 def bob(qubit, program):
     bob_measure_dir = choose_random_direction()
-    bob_measure_result = None
-
-    return bob_measure_dir, bob_measure_result
+    # TODO
+    return bob_measure_dir
 
 def charlie(qubit, program):
     charlie_measure_dir = choose_random_direction()
-    charlie_measure_result = None
-    
-    return charlie_measure_dir, charlie_measure_result
+    # TODO 
+    return charlie_measure_dir
 
 def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
     pass
@@ -67,14 +65,22 @@ for trial in range(NUM_TRIALS):
     # perform secret sharing procedure once per message bit
     for i in range(MSG_LENGTH):
         while (True): # retry until success
-            alice_measure_dir, alice_measure_result = alice(alice_q[i], message, program)
-            bob_measure_dir, bob_measure_result = bob(bob_q[i], program)
-            charlie_measure_dir, charlie_measure_result = charlie(charlie_q[i], program)
+            alice_measure_dir = alice(alice_q[i], message, program)
+            bob_measure_dir = bob(bob_q[i], program)
+            charlie_measure_dir = charlie(charlie_q[i], program)
             should_abort = check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir)
             if should_abort:
                 print("Abort! Measurements yielded no useful information. Retrying...") 
                 retries += 1
                 continue
+            # run program, now that we know results will be interesting
+            qvm = QVMConnection()
+            program = program.measure_all()
+            results = qvm.run(program)[0]
+            alice_measure_result = results[0]
+            bob_measure_result = results[1]
+            charlie_measure_result = results[2]
+
             joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
             if joint_result == alice_measure_result:
                 print("Success! Bob and Charlie reconstructed one bit of the secret message.")
