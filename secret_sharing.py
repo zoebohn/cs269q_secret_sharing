@@ -11,15 +11,21 @@ def choose_random_direction():
 
 def alice(qubit, message, program):
     alice_measure_dir = choose_random_direction()
-    pass
+    alice_measure_result = None
+
+    return alice_measure_dir, alice_measure_result
 
 def bob(qubit, program):
     bob_measure_dir = choose_random_direction()
-    pass
+    bob_measure_result = None
+
+    return bob_measure_dir, bob_measure_result
 
 def charlie(qubit, program):
     charlie_measure_dir = choose_random_direction()
-    pass
+    charlie_measure_result = None
+    
+    return charlie_measure_dir, charlie_measure_result
 
 def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
     pass
@@ -43,7 +49,7 @@ def initial_setup():
     
     program = Program()
     
-    # entangle qubits
+    # entangle qubits (GHZ)
     for q in range(0, MSG_LENGTH, 3):
         alice_qubits.append(q)
         bob_qubits.append(q + 1)
@@ -69,7 +75,7 @@ for trial in range(NUM_TRIALS):
                 print("Abort! Measurements yielded no useful information. Retrying...") 
                 retries += 1
                 continue
-            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result, charlie_measure_result)
+            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
             if joint_result == alice_measure_result:
                 print("Success! Bob and Charlie reconstructed one bit of the secret message.")
                 break
@@ -77,7 +83,7 @@ for trial in range(NUM_TRIALS):
                 print("Failure! Bob and Charlie reconstructed an incorrect bit of the secret message.")
                 exit() # end proram, we have a bug
 
-    print("Bob and Charlie succeeded with " + str(retries))
+    print("Bob and Charlie succeeded with " + str(retries) + " retries.")
 
     
 
