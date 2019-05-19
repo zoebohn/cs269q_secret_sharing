@@ -107,9 +107,9 @@ for trial in range(NUM_TRIALS):
             charlie_measure_result = results[2]
             
             joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
-            print("Alice measured " + str(alice_measure_result))
-            print("Bob measured " + str(bob_measure_result))
-            print("Charlie measured " + str(charlie_measure_result))
+            print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
+            print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
+            print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
             print("Bob and Charlie guessed " + str(joint_result))
             
             if joint_result == alice_measure_result:
