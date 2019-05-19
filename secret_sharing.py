@@ -51,6 +51,7 @@ def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
         return charlie_measure_dir == 'y'
     if alice_measure_dir == 'y' and bob_measure_dir == 'y':
         return charlie_measure_dir == 'x'
+    print("Should never get here")
 
 def bob_and_charlie(bob_measure_result, charlie_measure_result):
     # I think if charlie gets 0 that means result was opposite
@@ -93,7 +94,7 @@ for trial in range(NUM_TRIALS):
             alice_measure_dir, program = alice(alice_q, program)
             bob_measure_dir, program = bob(bob_q, program)
             charlie_measure_dir, program = charlie(charlie_q, program)
-            should_abort = check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir)
+            should_abort = not check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir)
             if should_abort:
                 print("Abort! Measurements yielded no useful information. Retrying...") 
                 retries += 1
