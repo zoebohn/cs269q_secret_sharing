@@ -2,6 +2,7 @@ from pyquil import Program
 from pyquil.gates import CNOT, H, S
 import random
 from pyquil.api import QVMConnection
+from pyquil.api import WavefunctionSimulator
 
 def choose_random_direction():
     x_or_y = random.getrandbits(1)
@@ -85,6 +86,10 @@ def initial_setup():
     
     # entangle qubits (GHZ)
     program = ghz_state([alice_qubit, bob_qubit, charlie_qubit], program)
+    print("Post GHZ state")
+    wf_sim = WavefunctionSimulator()
+    wavefunction = wf_sim.wavefunction(program)
+    print (wavefunction)
 
     return alice_qubit, bob_qubit, charlie_qubit, program
 
