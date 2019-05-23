@@ -53,13 +53,19 @@ def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
         return charlie_measure_dir == 'x'
     print("Should never get here")
 
-def bob_and_charlie(bob_measure_result, charlie_measure_result):
-    # I think if charlie gets 0 that means result was opposite
-    # but honestly not sure; maybe we should just experiment?
-    if (charlie_measure_result == 0):
-        return int(not bob_measure_result)
+def bob_and_charlie(bob_measure_result, charlie_measure_result, alice_measure_dir, bob_measure_dir, charlie_measure_dir):
+    # at this point we know the directions are valid
+    if alice_measure_dir == 'x' and bob_measure_dir == 'x':
+        if charlie_measure_result == 0:
+            return int(not bob_measure_result)
+        else:
+            return bob_measure_result
     else:
-        return bob_measure_result
+        if charlie_measure_result == 1:
+            return int(not bob_measure_result)
+        else:
+            return bob_measure_result
+    
 
 # from docs.rigetti.com
 def ghz_state(qubits, program):
@@ -107,7 +113,7 @@ for trial in range(NUM_TRIALS):
             bob_measure_result = results[1]
             charlie_measure_result = results[2]
             
-            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
+            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result, alice_measure_dir, bob_measure_dir, charlie_measure_dir)
             print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
             print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
             print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
