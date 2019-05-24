@@ -57,7 +57,7 @@ def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
 def bob_and_charlie(bob_measure_result, charlie_measure_result, alice_measure_dir, bob_measure_dir, charlie_measure_dir):
     # at this point we know the directions are valid
     if alice_measure_dir == 'x' and bob_measure_dir == 'x':
-        if charlie_measure_result == 0:
+        if charlie_measure_result == 1:
             return int(not bob_measure_result)
         else:
             return bob_measure_result
@@ -100,8 +100,8 @@ for trial in range(NUM_TRIALS):
 
     # perform secret sharing procedure once per message bit
     for i in range(MSG_LENGTH):
-        alice_q, bob_q, charlie_q, program = initial_setup()
         while (True): # retry until success
+            alice_q, bob_q, charlie_q, program = initial_setup()
             alice_measure_dir, program = alice(alice_q, program)
             bob_measure_dir, program = bob(bob_q, program)
             charlie_measure_dir, program = charlie(charlie_q, program)
