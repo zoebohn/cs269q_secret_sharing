@@ -42,7 +42,6 @@ def charlie(qubit, program):
     program = prepare_measurement(qubit, charlie_measure_dir, program)
     return charlie_measure_dir, program
 
-# TODO - very unsure of this
 def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
     if alice_measure_dir == 'x' and bob_measure_dir == 'x':
         return charlie_measure_dir == 'x'
@@ -54,19 +53,12 @@ def check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir):
         return charlie_measure_dir == 'x'
     print("Should never get here")
 
-def bob_and_charlie(bob_measure_result, charlie_measure_result, alice_measure_dir, bob_measure_dir, charlie_measure_dir):
+def bob_and_charlie(bob_measure_result, charlie_measure_result):
     # at this point we know the directions are valid
-    if alice_measure_dir == 'x' and bob_measure_dir == 'x':
-        if charlie_measure_result == 1:
-            return int(not bob_measure_result)
-        else:
-            return bob_measure_result
+    if charlie_measure_result == 1:
+        return int(not bob_measure_result)
     else:
-        if charlie_measure_result == 1:
-            return int(not bob_measure_result)
-        else:
-            return bob_measure_result
-    
+        return bob_measure_result
 
 # from docs.rigetti.com
 def ghz_state(qubits, program):
@@ -86,15 +78,11 @@ def initial_setup():
     
     # entangle qubits (GHZ)
     program = ghz_state([alice_qubit, bob_qubit, charlie_qubit], program)
-    print("Post GHZ state")
-    wf_sim = WavefunctionSimulator()
-    wavefunction = wf_sim.wavefunction(program)
-    print (wavefunction)
 
     return alice_qubit, bob_qubit, charlie_qubit, program
 
-MSG_LENGTH = 1 #@Emma: might have to tweak below code for longer messages to retry individual qubits rather than all of the qubits if 
-NUM_TRIALS = 1
+MSG_LENGTH = 1 
+NUM_TRIALS = 100 
 retries = 0
 for trial in range(NUM_TRIALS):
 
@@ -118,7 +106,7 @@ for trial in range(NUM_TRIALS):
             bob_measure_result = results[1]
             charlie_measure_result = results[2]
             
-            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result, alice_measure_dir, bob_measure_dir, charlie_measure_dir)
+            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
             print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
             print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
             print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
