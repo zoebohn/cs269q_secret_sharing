@@ -88,10 +88,12 @@ def initial_setup():
 MSG_LENGTH = 1 
 NUM_TRIALS = 100 
 retries = 0
+total_retries = 0
 qc = get_qc("9q-square-qvm")
 for trial in range(NUM_TRIALS):
 
     # perform secret sharing procedure once per message bit
+    retries = 0
     for i in range(MSG_LENGTH):
         while (True): # retry until success
             alice_q, bob_q, charlie_q, program = initial_setup()
@@ -105,32 +107,42 @@ for trial in range(NUM_TRIALS):
                 continue
             # run program, now that we know results will be interesting
             #qvm = QVMConnection()
+            program = program.measure_all()
+            #program.wrap_in_numshots_loop(1000)
+            #print(program)
             program = qc.compiler.quil_to_native_quil(program)
-            program = add_decoherence_noise(program)
-            program = program.measure_all() 
+            #program = add_decoherence_noise(program)
+            program = add_decoherence_noise(program, T1=30e-4, T2=30e-4, ro_fidelity=0.5)
+            program.wrap_in_numshots_loop(1000)
+            #program = program.measure_all() 
+            program = qc.compiler.native_quil_to_executable(program)
             #results = qvm.run(program)[0]
-            results = qc.run(program)[0]
-            alice_measure_result = results[0]
-            bob_measure_result = results[1]
-            charlie_measure_result = results[2]
+            results = qc.run(program)
+            #results = qc.run(program)[0]
+            #results = qc.run_and_measure(program, trials=1000)
             
-            joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
-            print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
-            print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
-            print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
-            print("Bob and Charlie guessed " + str(joint_result))
+            for j in range(1000):
+                curr_results = results[j]
+                alice_measure_result = curr_results[0]
+                bob_measure_result = curr_results[1]
+                charlie_measure_result = curr_results[2]
             
-            if joint_result == alice_measure_result:
-                print("Success! Bob and Charlie reconstructed one bit of the secret message.")
-                break
-            else:
-                print("Failure! Bob and Charlie reconstructed an incorrect bit of the secret message.")
-                exit() # end proram, we have a bug
+                joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
+                print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
+                print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
+                print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
+                print("Bob and Charlie guessed " + str(joint_result))
+            
+                if joint_result == alice_measure_result:
+                    print("Success! Bob and Charlie reconstructed one bit of the secret message.")
+                    break
+                else:
+                    print("Failure! Bob and Charlie reconstructed an incorrect bit of the secret message.")
+                    retries += 1
+                    #exit() # end proram, we have a bug
 
     print("Bob and Charlie succeeded with " + str(retries) + " retries.")
+    total_retries += retries
 
+print("Total retries: %d" % total_retries)
     
-
-
-
-
