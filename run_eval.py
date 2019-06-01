@@ -43,4 +43,5 @@ def collectROFidelity():
             f.write("%d\n" % num)
 
 
-collectT1AndT2()
+#collectT1AndT2()
+collectROFidelity()
