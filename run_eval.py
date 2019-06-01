@@ -1,14 +1,14 @@
 import secret_sharing as ss
 
-T1s = [(x + 1) * 1e-06 for x in range(10)]
-T2s = [(x + 1) * 1e-06 for x in range(10)]
-ro_fidelities = [(x + 1)/1000.0 for x in range(1000)]
+T1s = [(x/10.0 + 1) * 1e-06 for x in range(300)]
+T2s = [(x/10.0 + 1) * 1e-06 for x in range(300)]
+ro_fidelities = [(x + 1)/100.0 for x in range(100)]
 # from the pyquil defaults
-default_T1 = 5e-06
-#default_T1 = 3e-05
-default_T2 = 5e-06
-#default_T2 = 3e-05
-default_ro_fidelity = 0.95
+#default_T1 = 5e-06
+default_T1 = 3e-05
+#default_T2 = 5e-06
+default_T2 = 3e-05
+default_ro_fidelity = 1.0
 
 def collectT1AndT2():
     data = []
@@ -43,5 +43,5 @@ def collectROFidelity():
             f.write("%d\n" % num)
 
 
-#collectT1AndT2()
+collectT1AndT2()
 collectROFidelity()

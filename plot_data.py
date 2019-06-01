@@ -1,9 +1,9 @@
 import matplotlib
 import matplotlib.pyplot as plt
 
-T1s = [(x + 1) for x in range(10)]
-T2s = [(x + 1) for x in range(10)]
-ro_fidelities = [(x + 1)/10.0 for x in range(1000)]
+T1s = [(x/10.0 + 1) for x in range(300)]
+T2s = [(x/10.0 + 1) for x in range(300)]
+ro_fidelities = [(x + 1) for x in range(100)]
 
 def plotT1AndT2():
     y = []
@@ -16,7 +16,7 @@ def plotT1AndT2():
     plt.title("Failure Rate of Quantum Secret Sharing with Noise")
     plt.xlabel("T1 and T2 values (us)")
     plt.ylabel("Number of failures over 1,000 trials")
-    plt.xticks(T1s)
+    plt.xticks([(x * 5) for x in range(7)])
     plt.savefig("figs/T1_T2")
     plt.clf()
 
@@ -31,7 +31,7 @@ def plotROFidelity():
     plt.title("Failure Rate of Quantum Secret Sharing with Noise (Read-out fidelity)")
     plt.xlabel("Readout Fidelity (%)")
     plt.ylabel("Number of failures over 1,000 trials")
-    plt.xticks([(x + 1) * 10 for x in range(10)])
+    plt.xticks([(x) * 10 for x in range(11)])
     plt.savefig("figs/RO")
     plt.clf()
 
