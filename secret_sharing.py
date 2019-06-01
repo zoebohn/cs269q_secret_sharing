@@ -1,8 +1,10 @@
 from pyquil import Program
+from pyquil.noise import add_decoherence_noise
 from pyquil.gates import CNOT, H, S
 import random
 from pyquil.api import QVMConnection
 from pyquil.api import WavefunctionSimulator
+from pyquil.api import get_qc
 
 def choose_random_direction():
     x_or_y = random.getrandbits(1)
@@ -81,9 +83,12 @@ def initial_setup():
 
     return alice_qubit, bob_qubit, charlie_qubit, program
 
+
+
 MSG_LENGTH = 1 
 NUM_TRIALS = 100 
 retries = 0
+qc = get_qc("9q-square-qvm")
 for trial in range(NUM_TRIALS):
 
     # perform secret sharing procedure once per message bit
@@ -99,9 +104,12 @@ for trial in range(NUM_TRIALS):
                 retries += 1
                 continue
             # run program, now that we know results will be interesting
-            qvm = QVMConnection()
+            #qvm = QVMConnection()
+            program = qc.compiler.quil_to_native_quil(program)
+            program = add_decoherence_noise(program)
             program = program.measure_all() 
-            results = qvm.run(program)[0]
+            #results = qvm.run(program)[0]
+            results = qc.run(program)[0]
             alice_measure_result = results[0]
             bob_measure_result = results[1]
             charlie_measure_result = results[2]
