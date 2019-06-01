@@ -86,9 +86,11 @@ def initial_setup():
 
 
 MSG_LENGTH = 1 
-NUM_TRIALS = 100 
+#NUM_TRIALS = 100 
+NUM_TRIALS = 1 
 retries = 0
 total_retries = 0
+total_noise_fails = 0
 qc = get_qc("9q-square-qvm")
 for trial in range(NUM_TRIALS):
 
@@ -128,21 +130,24 @@ for trial in range(NUM_TRIALS):
                 charlie_measure_result = curr_results[2]
             
                 joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
-                print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
-                print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
-                print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
-                print("Bob and Charlie guessed " + str(joint_result))
+                #print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
+                #print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
+                #print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
+                #print("Bob and Charlie guessed " + str(joint_result))
             
                 if joint_result == alice_measure_result:
                     print("Success! Bob and Charlie reconstructed one bit of the secret message.")
-                    break
                 else:
                     print("Failure! Bob and Charlie reconstructed an incorrect bit of the secret message.")
                     retries += 1
+                    total_noise_fails += 1
                     #exit() # end proram, we have a bug
+            break
 
+    
     print("Bob and Charlie succeeded with " + str(retries) + " retries.")
     total_retries += retries
 
 print("Total retries: %d" % total_retries)
+print("Total noise fails: %d" % total_noise_fails)
     
