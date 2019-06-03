@@ -15,7 +15,6 @@ def choose_random_direction():
     else:
         return 'y'
 
-# TODO - somewhat unsure of this
     # measuring in x direction means applying an H gate
     # measuring in the y direction means apply an H gate followed by an S_dagger gate
     # (view in chrome): https://docs.microsoft.com/en-us/quantum/concepts/pauli-measurements?view=qsharp-preview
@@ -30,7 +29,6 @@ def prepare_measurement(qubit, direction, program):
 
     return program
 
-# TODO - how to incorporate message?
 def alice(qubit, program):
     alice_measure_dir = choose_random_direction()
     program = prepare_measurement(qubit, alice_measure_dir, program)
@@ -86,9 +84,8 @@ def initial_setup():
     return alice_qubit, bob_qubit, charlie_qubit, program
 
 
-def runExperiments(t1, t2, ro_fidelity):
+def runExperiments(t1, t2, ro_fidelity, q1time, q2time):
     global MSG_LENGTH
-    #NUM_TRIALS = 100 
     NUM_TRIALS = 1 
     retries = 0
     total_retries = 0
@@ -110,20 +107,12 @@ def runExperiments(t1, t2, ro_fidelity):
                     retries += 1
                     continue
                 # run program, now that we know results will be interesting
-                #qvm = QVMConnection()
                 program = program.measure_all()
-                #program.wrap_in_numshots_loop(1000)
-                #print(program)
                 program = qc.compiler.quil_to_native_quil(program)
-                #program = add_decoherence_noise(program)
-                program = add_decoherence_noise(program, T1=t1, T2=t2, ro_fidelity=ro_fidelity)
+                program = add_decoherence_noise(program, T1=t1, T2=t2, gate_time_1q=q1time, gate_time_2q=q2time, ro_fidelity=ro_fidelity)
                 program.wrap_in_numshots_loop(1000)
-                #program = program.measure_all() 
                 program = qc.compiler.native_quil_to_executable(program)
-                #results = qvm.run(program)[0]
                 results = qc.run(program)
-                #results = qc.run(program)[0]
-                #results = qc.run_and_measure(program, trials=1000)
             
                 for j in range(1000):
                     curr_results = results[j]
@@ -132,18 +121,12 @@ def runExperiments(t1, t2, ro_fidelity):
                     charlie_measure_result = curr_results[2]
             
                     joint_result = bob_and_charlie(bob_measure_result, charlie_measure_result)
-                    #print("Alice measured in " + alice_measure_dir + " and got " + str(alice_measure_result))
-                    #print("Bob measured in " + bob_measure_dir + " and got " + str(bob_measure_result))
-                    #print("Charlie measured in " + charlie_measure_dir + " and got " + str(charlie_measure_result))
-                    #print("Bob and Charlie guessed " + str(joint_result))
-            
                     if joint_result == alice_measure_result:
                         print("Success! Bob and Charlie reconstructed one bit of the secret message.")
                     else:
                         print("Failure! Bob and Charlie reconstructed an incorrect bit of the secret message.")
                         retries += 1
                         total_noise_fails += 1
-                        #exit() # end proram, we have a bug
                 break
 
     
