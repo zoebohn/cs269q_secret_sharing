@@ -87,32 +87,33 @@ def initial_setup():
 def runExperiments(t1, t2, ro_fidelity, q1time, q2time):
     global MSG_LENGTH
     NUM_TRIALS = 1 
-    retries = 0
     total_retries = 0
     total_noise_fails = 0
     qc = get_qc("9q-square-qvm")
     for trial in range(NUM_TRIALS):
 
         # perform secret sharing procedure once per message bit
-        retries = 0
         for i in range(MSG_LENGTH):
             while (True): # retry until success
                 alice_q, bob_q, charlie_q, program = initial_setup()
                 alice_measure_dir, program = alice(alice_q, program)
                 bob_measure_dir, program = bob(bob_q, program)
                 charlie_measure_dir, program = charlie(charlie_q, program)
-                should_abort = not check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir)
-                if should_abort:
-                    print("Abort! Measurements yielded no useful information. Retrying...") 
-                    retries += 1
-                    continue
-                # run program, now that we know results will be interesting
+                
+                # run program with noise
                 program = program.measure_all()
                 program = qc.compiler.quil_to_native_quil(program)
                 program = add_decoherence_noise(program, T1=t1, T2=t2, gate_time_1q=q1time, gate_time_2q=q2time, ro_fidelity=ro_fidelity)
                 program.wrap_in_numshots_loop(1000)
                 program = qc.compiler.native_quil_to_executable(program)
                 results = qc.run(program)
+               
+                # check if measurements were in right direction
+                should_abort = not check_directions(alice_measure_dir, bob_measure_dir, charlie_measure_dir)
+                if should_abort:
+                    print("Abort! Measurements yielded no useful information. Retrying...") 
+                    total_retries += 1
+                    continue
             
                 for j in range(1000):
                     curr_results = results[j]
@@ -125,7 +126,6 @@ def runExperiments(t1, t2, ro_fidelity, q1time, q2time):
                         print("Success! Bob and Charlie reconstructed one bit of the secret message.")
                     else:
                         print("Failure! Bob and Charlie reconstructed an incorrect bit of the secret message.")
-                        retries += 1
                         total_noise_fails += 1
                 break
 
